@@ -5,6 +5,9 @@ import { VideoModule } from './video/video.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AudioModule } from './audio/audio.module';
 import { TranscriptionModule } from './transcription/transcription.module';
+import { Transcription } from './transcription/entities/transcription.entity';
+import { Video } from './video/entities/video.entity';
+import { Audio } from './audio/entities/audio.entity';
 
 @Module({
   imports: [
@@ -15,8 +18,9 @@ import { TranscriptionModule } from './transcription/transcription.module';
       username: process.env.TYPEORM_USERNAME,
       password: process.env.TYPEORM_PASSWORD,
       database: process.env.TYPEORM_DATABASE,
-      autoLoadEntities: true,
-      synchronize: process.env.TYPEORM_SYNC === 'true' ? true : false,
+      entities: [Video, Audio, Transcription],
+      synchronize: true,
+      logging: false,
     }),
     VideoModule,
     AudioModule,
