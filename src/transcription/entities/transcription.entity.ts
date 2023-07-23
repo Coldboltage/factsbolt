@@ -11,11 +11,14 @@ export class Transcription {
   assemblyId: string;
 
   @Column()
+  link: string;
+
+  @Column()
   text: string;
 
   @OneToOne(() => Audio)
-  audio: Audio;
+  audio?: Audio;
 
   @OneToOne(() => Video)
-  video: Video;
+  video?: Video;
 }

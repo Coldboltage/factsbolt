@@ -3,6 +3,8 @@ import { VideoService } from './video.service';
 import { createMock } from '@golevelup/ts-jest';
 import { Repository } from 'typeorm/repository/Repository';
 import { Video } from './entities/video.entity';
+import { CreateVideoDto } from './dto/create-video.dto';
+import { ConflictException } from '@nestjs/common';
 
 describe('VideoService', () => {
   let service: VideoService;
@@ -62,6 +64,55 @@ describe('VideoService', () => {
 
       // Assert
       expect(result).toBe(null);
+      expect(findOneSpy).toBeCalled();
+    });
+  });
+
+  describe('create', () => {
+    it('Create a Video Record', async () => {
+      // Arrange
+      const linkId = 'https://youtu.be/KDclmm2iwMY?list=RDKDclmm2iwMY';
+
+      const createVideoDto = new CreateVideoDto();
+      createVideoDto.link = linkId;
+
+      const newVideo = new Video();
+      newVideo.link = createVideoDto.link;
+
+      const findOneSpy = jest
+        .spyOn(service, 'findVideoByLink')
+        .mockResolvedValueOnce(null);
+      const createOneSpy = jest
+        .spyOn(videoRepository, 'save')
+        .mockResolvedValueOnce(newVideo);
+
+      // Act
+      const result = await service.create(createVideoDto);
+
+      // Asset
+      expect(result).toEqual(newVideo);
+      expect(findOneSpy).toBeCalledTimes(1);
+      expect(createOneSpy).toBeCalledTimes(1);
+    });
+
+    it('Should throw an ConflictException if link exists', async () => {
+      // Arrange
+      const linkId = 'https://youtu.be/KDclmm2iwMY?list=RDKDclmm2iwMY';
+
+      const createVideoDto = new CreateVideoDto();
+      createVideoDto.link = linkId;
+
+      const foundVideo = new Video();
+      foundVideo.link = createVideoDto.link;
+
+      const findOneSpy = jest
+        .spyOn(service, 'findVideoByLink')
+        .mockResolvedValueOnce(foundVideo);
+
+      // Act + Assert
+      await expect(service.create(createVideoDto)).rejects.toThrow(
+        new ConflictException('video_already_exists'),
+      );
       expect(findOneSpy).toBeCalled();
     });
   });

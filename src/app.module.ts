@@ -8,6 +8,8 @@ import { TranscriptionModule } from './transcription/transcription.module';
 import { Transcription } from './transcription/entities/transcription.entity';
 import { Video } from './video/entities/video.entity';
 import { Audio } from './audio/entities/audio.entity';
+import { ChatgptModule } from './chatgpt/chatgpt.module';
+import { ChatGPT } from './chatgpt/entity/chatgpt.entity';
 
 @Module({
   imports: [
@@ -18,13 +20,14 @@ import { Audio } from './audio/entities/audio.entity';
       username: process.env.TYPEORM_USERNAME,
       password: process.env.TYPEORM_PASSWORD,
       database: process.env.TYPEORM_DATABASE,
-      entities: [Video, Audio, Transcription],
+      entities: [Video, Audio, Transcription, ChatGPT],
       synchronize: true,
       logging: false,
     }),
     VideoModule,
     AudioModule,
     TranscriptionModule,
+    ChatgptModule,
   ],
   controllers: [AppController],
   providers: [AppService],
