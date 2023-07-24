@@ -31,7 +31,7 @@ export class Video {
   @JoinColumn()
   transcription: Transcription;
 
-  @OneToOne(() => ChatGPT)
+  @OneToOne(() => ChatGPT, {eager: true})
   @JoinColumn()
   chatgpt: ChatGPT;
 }

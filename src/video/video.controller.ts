@@ -42,6 +42,13 @@ export class VideoController {
     return this.videoService.remove(+id);
   }
 
+  @Get('find/get-or-generate-video')
+  async getOrGenerateVideo(
+    @Body() createVideoDto: CreateVideoDto,
+  ): Promise<Video> {
+    return this.videoService.getOrGenerateVideo(createVideoDto);
+  }
+
   // Message Pattern
 
   // @MessagePattern('completedJob')

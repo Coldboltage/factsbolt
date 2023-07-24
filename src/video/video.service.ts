@@ -88,12 +88,21 @@ export class VideoService {
       transciptionEntity,
     );
 
-    const savedChatGPTEntity = await this.chatgptRepostiroy.save(chatgptEntity)
+    const savedChatGPTEntity = await this.chatgptRepostiroy.save(chatgptEntity);
 
     videoEntity.transcription = savedTranscriptionEntity;
-    videoEntity.chatgpt = savedChatGPTEntity
+    videoEntity.chatgpt = savedChatGPTEntity;
 
     await this.videoRepository.save(videoEntity);
+    return videoEntity;
+  }
+
+  async getOrGenerateVideo(createVideoDto: CreateVideoDto): Promise<Video> {
+    const videoEntity = await this.findVideoByLink(createVideoDto.link);
+    if (!videoEntity) {
+      console.log("No video found")
+      return this.create(createVideoDto);
+    }
     return videoEntity;
   }
 }
