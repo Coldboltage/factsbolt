@@ -21,6 +21,9 @@ export class Video {
   link: string;
 
   @Column({ nullable: true })
+  originId: string;
+
+  @Column({ nullable: true })
   website?: string;
 
   @OneToOne(() => Audio)
@@ -31,7 +34,7 @@ export class Video {
   @JoinColumn()
   transcription: Transcription;
 
-  @OneToOne(() => ChatGPT, {eager: true})
+  @OneToOne(() => ChatGPT, { eager: true })
   @JoinColumn()
   chatgpt: ChatGPT;
 }

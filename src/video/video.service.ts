@@ -1,4 +1,10 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { Video } from './entities/video.entity';
@@ -7,6 +13,7 @@ import { Repository } from 'typeorm';
 import { ClientProxy } from '@nestjs/microservices';
 import { Transcription } from '../transcription/entities/transcription.entity';
 import { ChatGPT } from '../chatgpt/entity/chatgpt.entity';
+import { FullJob } from 'factsbolt-types';
 
 @Injectable()
 export class VideoService {
@@ -25,19 +32,19 @@ export class VideoService {
 
   async create(createVideoDto: CreateVideoDto): Promise<Video> {
     console.log('Hello Alan');
-    // const videoByLink = await this.findVideoByLink(createVideoDto.link);
-    // if (videoByLink) throw new ConflictException('video_already_exists');
-    // const createVideoFromLink = await this.videoRepository.create(
-    //   createVideoDto,
-    // );
-    const createVideoFromLink = await this.videoRepository.save(createVideoDto);
+    const videoByLink = await this.findVideoByLink(createVideoDto.link);
+    if (videoByLink) throw new ConflictException('video_already_exists');
 
-    console.log(createVideoFromLink);
+    const videoById = await this.findVideoByOriginId(
+      this.checkURL(createVideoDto.link),
+    );
+    if (videoById) throw new ConflictException('video_already_exists');
 
-    // this.client.send('newJob', createVideoDto.link).subscribe({
-    //   next: (result) => console.log(result),
-    //   error: (error) => console.error(error),
-    // });
+    const createVideoFromLink = this.videoRepository.save({
+      ...createVideoDto,
+      originId: this.checkURL(createVideoDto.link),
+    });
+
     this.client.emit('newJob', createVideoDto.link);
     return createVideoFromLink;
   }
@@ -65,13 +72,22 @@ export class VideoService {
     return videoByLink;
   }
 
-  async saveFullVideoJob(data: any): Promise<Video> {
+  async findVideoByOriginId(originId: string): Promise<Video> {
+    const videoByLink = await this.videoRepository.findOne({
+      where: { originId },
+    });
+    if (!videoByLink) return null;
+    return videoByLink;
+  }
+
+  async saveFullVideoJob(data: FullJob): Promise<Video> {
     const videoEntity = await this.findVideoByLink(data.video.link);
 
     console.log(videoEntity);
 
     videoEntity.name = data.video.name;
     videoEntity.website = 'Youtube'; // TODO GRAB FROM URL
+    videoEntity.originId = data.video.id;
 
     const transciptionEntity = this.transcriptRepostiroy.create({
       assemblyId: data.transcription.assembleyId,
@@ -82,6 +98,7 @@ export class VideoService {
     const chatgptEntity = this.chatgptRepostiroy.create({
       created: new Date(),
       content: data.chatgpt.content,
+      plainText: data.chatgpt.plainText,
     });
 
     const savedTranscriptionEntity = await this.transcriptRepostiroy.save(
@@ -100,9 +117,35 @@ export class VideoService {
   async getOrGenerateVideo(createVideoDto: CreateVideoDto): Promise<Video> {
     const videoEntity = await this.findVideoByLink(createVideoDto.link);
     if (!videoEntity) {
-      console.log("No video found")
+      console.log('No video found');
       return this.create(createVideoDto);
     }
     return videoEntity;
+  }
+
+  checkURL(url: string): string {
+    const youtube = ['youtube', 'youtu.be'];
+    let site: string;
+
+    for (const hostname of youtube) {
+      if (url.includes(hostname)) site = 'youtube';
+    }
+
+    switch (site) {
+      case 'youtube':
+        const test = this.extractYoutubeID(url);
+        return test;
+      default:
+        throw new NotFoundException('website_not_found');
+    }
+  }
+
+  extractYoutubeID(url: string) {
+    const regex =
+      /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/|shorts\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
+    const youtubeId = url.match(regex);
+    if (!youtubeId)
+      throw new NotAcceptableException('id_not_found_or_link_bad_format');
+    return youtubeId[1];
   }
 }

@@ -12,6 +12,8 @@ import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { Video } from './entities/video.entity';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
+import { FullJob } from 'factsbolt-types';
+import { CheckUrl } from './dto/check-url.dto';
 
 @Controller('video')
 export class VideoController {
@@ -49,11 +51,16 @@ export class VideoController {
     return this.videoService.getOrGenerateVideo(createVideoDto);
   }
 
+  @Get('find/check-url')
+  async checkURL(@Body() checkUrl: CheckUrl) {
+    return this.videoService.checkURL(checkUrl.url);
+  }
+
   // Message Pattern
 
   // @MessagePattern('completedJob')
   @EventPattern('completedJob')
-  async completedJob(@Payload() data: Video): Promise<string> {
+  async completedJob(@Payload() data: FullJob): Promise<string> {
     console.log('Hello World');
     console.log(data);
     const result = await this.videoService.saveFullVideoJob(data);

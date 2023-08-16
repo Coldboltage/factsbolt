@@ -10,6 +10,9 @@ export class ChatGPT {
 
   @Column({ type: 'simple-array' })
   content: Content;
+
+  @Column({ nullable: true })
+  plainText: string;
 }
 
 export interface Content {
