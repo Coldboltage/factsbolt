@@ -37,4 +37,7 @@ export class Video {
   @OneToOne(() => ChatGPT, { eager: true })
   @JoinColumn()
   chatgpt: ChatGPT;
+
+  @Column({ nullable: true })
+  meta: string;
 }

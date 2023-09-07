@@ -21,6 +21,9 @@ import { ChatGPT } from '../chatgpt/entity/chatgpt.entity';
           queueOptions: {
             durable: false,
           },
+          socketOptions: {
+            heartbeat: 300, // heartbeat interval in seconds
+          },
         },
       },
     ]),
