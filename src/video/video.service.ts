@@ -125,22 +125,41 @@ export class VideoService {
 
   checkURL(url: string): string {
     const youtube = ['youtube', 'youtu.be'];
+    const tiktok = ['tiktok'];
     let site: string;
 
     for (const hostname of youtube) {
-      if (url.includes(hostname)) site = 'youtube';
+      if (url.includes(hostname) && !site) site = 'youtube';
     }
+
+    for (const hostname of tiktok) {
+      if (url.includes(hostname) && !site) site = 'tiktok';
+    }
+
+    let test: string;
 
     switch (site) {
       case 'youtube':
-        const test = this.extractYoutubeID(url);
+        test = this.youtubeId(url);
+        return test;
+      case 'tiktok':
+        test = this.extractTikTokID(url);
         return test;
       default:
         throw new NotFoundException('website_not_found');
     }
   }
 
-  extractYoutubeID(url: string) {
+  extractTikTokID(url: string) {
+    const regex =
+      /\bhttps?:\/\/(?:m|www)\.tiktok\.com\/.*\b(?:(?:usr|v|embed|user|video)\/|\?shareId=)(\d+)\b/;
+    const tiktokId = url.match(regex);
+    console.log(tiktokId)
+    if (!tiktokId)
+      throw new NotAcceptableException('id_not_found_or_link_bad_format');
+    return tiktokId[1];
+  }
+  youtubeId(url: string) {
     const regex =
       /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/|shorts\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
     const youtubeId = url.match(regex);
