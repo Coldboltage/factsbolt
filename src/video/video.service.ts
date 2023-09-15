@@ -40,9 +40,11 @@ export class VideoService {
     );
     if (videoById) throw new ConflictException('video_already_exists');
 
+    console.log(videoById)
+
     const createVideoFromLink = this.videoRepository.save({
       ...createVideoDto,
-      originId: this.checkURL(createVideoDto.link),
+      originId: videoById.originId,
     });
 
     this.client.emit('newJob', createVideoDto.link);
@@ -126,6 +128,7 @@ export class VideoService {
   checkURL(url: string): string {
     const youtube = ['youtube', 'youtu.be'];
     const tiktok = ['tiktok'];
+    const instagram = ['instagram'];
     let site: string;
 
     for (const hostname of youtube) {
@@ -136,30 +139,46 @@ export class VideoService {
       if (url.includes(hostname) && !site) site = 'tiktok';
     }
 
+    for (const hostname of instagram) {
+      if (url.includes(hostname) && !site) site = 'instagram';
+    }
+
     let test: string;
 
     switch (site) {
       case 'youtube':
-        test = this.youtubeId(url);
+        test = this.extraxtYoutubeId(url);
         return test;
       case 'tiktok':
         test = this.extractTikTokID(url);
+        return test;
+      case 'instagram':
+        test = this.extractInstagramId(url);
         return test;
       default:
         throw new NotFoundException('website_not_found');
     }
   }
 
+  extractInstagramId(url: string) {
+    const regex = /\/p\/([a-zA-Z0-9_-]+)/;
+    const instagramId = url.match(regex);
+    if (!instagramId)
+      throw new NotAcceptableException('id_not_found_or_link_bad_format');
+    console.log('Alan we got here you fucking cunt');
+    return instagramId[1];
+  }
+
   extractTikTokID(url: string) {
     const regex =
       /\bhttps?:\/\/(?:m|www)\.tiktok\.com\/.*\b(?:(?:usr|v|embed|user|video)\/|\?shareId=)(\d+)\b/;
     const tiktokId = url.match(regex);
-    console.log(tiktokId)
+    console.log(tiktokId);
     if (!tiktokId)
       throw new NotAcceptableException('id_not_found_or_link_bad_format');
     return tiktokId[1];
   }
-  youtubeId(url: string) {
+  extraxtYoutubeId(url: string) {
     const regex =
       /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/|shorts\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
     const youtubeId = url.match(regex);

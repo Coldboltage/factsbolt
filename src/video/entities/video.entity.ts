@@ -8,6 +8,7 @@ import {
 import { Audio } from '../../audio/entities/audio.entity';
 import { Transcription } from '../../transcription/entities/transcription.entity';
 import { ChatGPT } from '../../chatgpt/entity/chatgpt.entity';
+import { JobStatus } from 'factsbolt-types';
 
 @Entity()
 export class Video {
@@ -40,4 +41,11 @@ export class Video {
 
   @Column({ nullable: true })
   meta: string;
+
+  @Column({
+    type: 'enum',
+    enum: JobStatus,
+    default: JobStatus.IN_PROGRESS,
+  })
+  status: JobStatus;
 }
