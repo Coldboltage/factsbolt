@@ -40,11 +40,11 @@ export class VideoService {
     );
     if (videoById) throw new ConflictException('video_already_exists');
 
-    console.log(videoById)
+    console.log(videoById);
 
     const createVideoFromLink = this.videoRepository.save({
       ...createVideoDto,
-      originId: videoById.originId,
+      originId: this.checkURL(createVideoDto.link),
     });
 
     this.client.emit('newJob', createVideoDto.link);
