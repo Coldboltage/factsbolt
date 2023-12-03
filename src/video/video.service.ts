@@ -14,6 +14,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { Transcription } from '../transcription/entities/transcription.entity';
 import { ChatGPT } from '../chatgpt/entity/chatgpt.entity';
 import { FullJob } from 'factsbolt-types';
+import { TextOnlyDto } from './dto/text-only.dto';
 
 @Injectable()
 export class VideoService {
@@ -123,6 +124,10 @@ export class VideoService {
       return this.create(createVideoDto);
     }
     return videoEntity;
+  }
+
+  async getOrGenerateText(textOnlyDto: TextOnlyDto) {
+    this.client.emit('text-only', textOnlyDto);
   }
 
   checkURL(url: string): string {

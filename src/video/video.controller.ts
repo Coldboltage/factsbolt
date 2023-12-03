@@ -14,6 +14,7 @@ import { Video } from './entities/video.entity';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { FullJob } from 'factsbolt-types';
 import { CheckUrl } from './dto/check-url.dto';
+import { TextOnlyDto } from './dto/text-only.dto';
 
 @Controller('video')
 export class VideoController {
@@ -49,6 +50,11 @@ export class VideoController {
     @Body() createVideoDto: CreateVideoDto,
   ): Promise<Video> {
     return this.videoService.getOrGenerateVideo(createVideoDto);
+  }
+
+  @Get('find/get-or-generate-text')
+  async textOnlyGenerate(@Body() textOnlyDto: TextOnlyDto) {
+    return this.videoService.getOrGenerateText(textOnlyDto);
   }
 
   @Get('find/check-url')
