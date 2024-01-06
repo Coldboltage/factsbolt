@@ -4,6 +4,6 @@ import { AudioController } from './audio.controller';
 
 @Module({
   controllers: [AudioController],
-  providers: [AudioService]
+  providers: [AudioService],
 })
 export class AudioModule {}
