@@ -7,13 +7,12 @@ import {
 } from '@nestjs/common';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
-import { Video } from './entities/video.entity';
+import { FullJob, Video } from './entities/video.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientProxy } from '@nestjs/microservices';
 import { Transcription } from '../transcription/entities/transcription.entity';
 import { ChatGPT } from '../chatgpt/entity/chatgpt.entity';
-import { FullJob } from 'factsbolt-types';
 import { TextOnlyDto } from './dto/text-only.dto';
 
 @Injectable()
