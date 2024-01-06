@@ -10,9 +10,8 @@ import {
 import { VideoService } from './video.service';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
-import { Video } from './entities/video.entity';
-import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
-import { FullJob } from 'factsbolt-types';
+import { FullJob, Video } from './entities/video.entity';
+import { EventPattern, Payload } from '@nestjs/microservices';
 import { CheckUrl } from './dto/check-url.dto';
 import { TextOnlyDto } from './dto/text-only.dto';
 

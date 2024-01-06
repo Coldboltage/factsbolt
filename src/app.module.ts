@@ -10,9 +10,19 @@ import { Video } from './video/entities/video.entity';
 import { Audio } from './audio/entities/audio.entity';
 import { ChatgptModule } from './chatgpt/chatgpt.module';
 import { ChatGPT } from './chatgpt/entity/chatgpt.entity';
+import { ConfigModule } from '@nestjs/config';
+
+console.log(process.env.TYPEORM_PASSWORD);
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? '.env.production'
+          : '.env.local',
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.TYPEORM_HOST,
