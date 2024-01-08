@@ -7,24 +7,31 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TranscriptionModule } from '../transcription/transcription.module';
 import { Transcription } from '../transcription/entities/transcription.entity';
 import { ChatGPT } from '../chatgpt/entity/chatgpt.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     forwardRef(() => TranscriptionModule),
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: 'FACTSBOLT_API',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://localhost:5672'],
-          queue: 'video_queue',
-          queueOptions: {
-            durable: false,
+        imports: [ConfigModule],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [
+              `amqp://${configService.get<string>('RABBITMQ_BASEURL')}:5672`,
+            ],
+            queue: 'video_queue',
+            queueOptions: {
+              durable: false,
+            },
+            socketOptions: {
+              heartbeat: 300, // heartbeat interval in seconds
+            },
           },
-          socketOptions: {
-            heartbeat: 300, // heartbeat interval in seconds
-          },
-        },
+        }),
+        inject: [ConfigService],
       },
     ]),
     TypeOrmModule.forFeature([Video, Transcription, ChatGPT]),
