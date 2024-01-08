@@ -27,7 +27,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
               durable: false,
             },
             socketOptions: {
-              heartbeat: 300, // heartbeat interval in seconds
+              heartbeatIntervalInSeconds: 60, // Heartbeat interval in seconds
             },
           },
         }),
