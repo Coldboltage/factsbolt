@@ -12,8 +12,6 @@ import { ChatgptModule } from './chatgpt/chatgpt.module';
 import { ChatGPT } from './chatgpt/entity/chatgpt.entity';
 import { ConfigModule } from '@nestjs/config';
 
-console.log(process.env.TYPEORM_PASSWORD);
-
 @Module({
   imports: [
     ConfigModule.forRoot({
