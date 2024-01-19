@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { VideoService } from './video.service';
 import { CreateVideoDto } from './dto/create-video.dto';
@@ -21,7 +22,7 @@ export class VideoController {
 
   @Post()
   async create(@Body() createVideoDto: CreateVideoDto): Promise<Video> {
-    return this.videoService.create(createVideoDto);
+    return this.videoService.create(createVideoDto.link);
   }
 
   @Get()
@@ -44,11 +45,16 @@ export class VideoController {
     return this.videoService.remove(+id);
   }
 
+  // @Get('find/get-or-generate-video')
+  // async getOrGenerateVideo(
+  //   @Body() createVideoDto: CreateVideoDto,
+  // ): Promise<Video> {
+  //   return this.videoService.getOrGenerateVideo(createVideoDto);
+  // }
+
   @Get('find/get-or-generate-video')
-  async getOrGenerateVideo(
-    @Body() createVideoDto: CreateVideoDto,
-  ): Promise<Video> {
-    return this.videoService.getOrGenerateVideo(createVideoDto);
+  async getOrGenerateVideo(@Query('link') link: string): Promise<Video> {
+    return this.videoService.getOrGenerateVideo(link);
   }
 
   @Get('find/get-or-generate-text')

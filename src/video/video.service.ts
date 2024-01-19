@@ -30,24 +30,22 @@ export class VideoService {
     await this.client.connect();
   }
 
-  async create(createVideoDto: CreateVideoDto): Promise<Video> {
+  async create(link: string): Promise<Video> {
     console.log('Hello Alan');
-    const videoByLink = await this.findVideoByLink(createVideoDto.link);
+    const videoByLink = await this.findVideoByLink(link);
     if (videoByLink) throw new ConflictException('video_already_exists');
 
-    const videoById = await this.findVideoByOriginId(
-      this.checkURL(createVideoDto.link),
-    );
+    const videoById = await this.findVideoByOriginId(this.checkURL(link));
     if (videoById) throw new ConflictException('video_already_exists');
 
     console.log(videoById);
 
     const createVideoFromLink = this.videoRepository.save({
-      ...createVideoDto,
-      originId: this.checkURL(createVideoDto.link),
+      link,
+      originId: this.checkURL(link),
     });
 
-    this.client.emit('newJob', createVideoDto.link);
+    this.client.emit('newJob', link);
     return createVideoFromLink;
   }
 
@@ -116,11 +114,11 @@ export class VideoService {
     return videoEntity;
   }
 
-  async getOrGenerateVideo(createVideoDto: CreateVideoDto): Promise<Video> {
-    const videoEntity = await this.findVideoByLink(createVideoDto.link);
+  async getOrGenerateVideo(link: string): Promise<Video> {
+    const videoEntity = await this.findVideoByLink(link);
     if (!videoEntity) {
       console.log('No video found');
-      return this.create(createVideoDto);
+      return this.create(link);
     }
     return videoEntity;
   }
