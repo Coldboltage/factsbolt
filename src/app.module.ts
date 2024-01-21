@@ -11,6 +11,7 @@ import { Audio } from './audio/entities/audio.entity';
 import { ChatgptModule } from './chatgpt/chatgpt.module';
 import { ChatGPT } from './chatgpt/entity/chatgpt.entity';
 import { ConfigModule } from '@nestjs/config';
+import { ScrapperModule } from './scrapper/scrapper.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ConfigModule } from '@nestjs/config';
     AudioModule,
     TranscriptionModule,
     ChatgptModule,
+    ScrapperModule,
   ],
   controllers: [AppController],
   providers: [AppService],
