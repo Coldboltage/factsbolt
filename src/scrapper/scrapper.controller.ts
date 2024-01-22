@@ -1,35 +1,46 @@
-import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ScrapperService } from './scrapper.service';
 import { CreateScrapperDto } from './dto/create-scrapper.dto';
 import { UpdateScrapperDto } from './dto/update-scrapper.dto';
 
-@Controller()
+@Controller('scrapper')
 export class ScrapperController {
   constructor(private readonly scrapperService: ScrapperService) {}
 
-  @MessagePattern('createScrapper')
-  create(@Payload() createScrapperDto: CreateScrapperDto) {
-    return this.scrapperService.create(createScrapperDto);
+  @Post(':id')
+  create(@Param('id') id: string) {
+    return this.scrapperService.create(id);
   }
 
-  @MessagePattern('findAllScrapper')
+  @Get()
   findAll() {
     return this.scrapperService.findAll();
   }
 
-  @MessagePattern('findOneScrapper')
-  findOne(@Payload() id: number) {
+  @Get(':id')
+  findOne(@Param('id') id: string) {
     return this.scrapperService.findOne(id);
   }
 
-  @MessagePattern('updateScrapper')
-  update(@Payload() updateScrapperDto: UpdateScrapperDto) {
-    return this.scrapperService.update(updateScrapperDto.id, updateScrapperDto);
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateScrapperDto: UpdateScrapperDto,
+  ) {
+    console.log(updateScrapperDto);
+    return this.scrapperService.update(id, updateScrapperDto);
   }
 
-  @MessagePattern('removeScrapper')
-  remove(@Payload() id: number) {
-    return this.scrapperService.remove(id);
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.scrapperService.remove(+id);
   }
 }
