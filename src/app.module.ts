@@ -11,6 +11,8 @@ import { Audio } from './audio/entities/audio.entity';
 import { ChatgptModule } from './chatgpt/chatgpt.module';
 import { ChatGPT } from './chatgpt/entity/chatgpt.entity';
 import { ConfigModule } from '@nestjs/config';
+import { ScrapperModule } from './scrapper/scrapper.module';
+import { Scrapper } from './scrapper/entities/scrapper.entity';
 
 @Module({
   imports: [
@@ -28,7 +30,7 @@ import { ConfigModule } from '@nestjs/config';
       username: process.env.TYPEORM_USERNAME,
       password: process.env.TYPEORM_PASSWORD,
       database: process.env.TYPEORM_DATABASE,
-      entities: [Video, Audio, Transcription, ChatGPT],
+      entities: [Video, Audio, Transcription, ChatGPT, Scrapper],
       synchronize: true,
       logging: false,
     }),
@@ -36,6 +38,7 @@ import { ConfigModule } from '@nestjs/config';
     AudioModule,
     TranscriptionModule,
     ChatgptModule,
+    ScrapperModule,
   ],
   controllers: [AppController],
   providers: [AppService],
