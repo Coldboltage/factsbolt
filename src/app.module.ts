@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { VideoModule } from './video/video.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AudioModule } from './audio/audio.module';
@@ -10,9 +9,10 @@ import { Video } from './video/entities/video.entity';
 import { Audio } from './audio/entities/audio.entity';
 import { ChatgptModule } from './chatgpt/chatgpt.module';
 import { ChatGPT } from './chatgpt/entity/chatgpt.entity';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScrapperModule } from './scrapper/scrapper.module';
 import { Scrapper } from './scrapper/entities/scrapper.entity';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -23,17 +23,26 @@ import { Scrapper } from './scrapper/entities/scrapper.entity';
           : '.env.local',
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.TYPEORM_HOST,
-      port: +process.env.TYPEORM_PORT,
-      username: process.env.TYPEORM_USERNAME,
-      password: process.env.TYPEORM_PASSWORD,
-      database: process.env.TYPEORM_DATABASE,
-      entities: [Video, Audio, Transcription, ChatGPT, Scrapper],
-      synchronize: true,
-      logging: false,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        console.log(configService.get<string>('TYPEORM_HOST'));
+        return {
+          type: 'postgres',
+          host: configService.get<string>('TYPEORM_HOST'),
+          port: configService.get<number>('TYPEORM_PORT'),
+          username: configService.get<string>('TYPEORM_USERNAME'),
+          password: configService.get<string>('TYPEORM_PASSWORD'),
+          database: configService.get<string>('TYPEORM_DATABASE'),
+          entities: [Video, Audio, Transcription, ChatGPT, Scrapper],
+          synchronize: true,
+          logging: false,
+        };
+      },
+
+      inject: [ConfigService],
     }),
+
     VideoModule,
     AudioModule,
     TranscriptionModule,
