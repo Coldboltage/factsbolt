@@ -13,6 +13,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScrapperModule } from './scrapper/scrapper.module';
 import { Scrapper } from './scrapper/entities/scrapper.entity';
 import { AppService } from './app.service';
+import { TextModule } from './text/text.module';
+import { TextEntity } from './text/entities/text.entity';
 
 @Module({
   imports: [
@@ -34,7 +36,14 @@ import { AppService } from './app.service';
           username: configService.get<string>('TYPEORM_USERNAME'),
           password: configService.get<string>('TYPEORM_PASSWORD'),
           database: configService.get<string>('TYPEORM_DATABASE'),
-          entities: [Video, Audio, Transcription, ChatGPT, Scrapper],
+          entities: [
+            Video,
+            Audio,
+            Transcription,
+            ChatGPT,
+            Scrapper,
+            TextEntity,
+          ],
           synchronize: true,
           logging: false,
         };
@@ -48,6 +57,7 @@ import { AppService } from './app.service';
     TranscriptionModule,
     ChatgptModule,
     ScrapperModule,
+    TextModule,
   ],
   controllers: [AppController],
   providers: [AppService],
